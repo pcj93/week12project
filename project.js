@@ -1,4 +1,4 @@
-class Pokmeon {
+class Pokemon {
     constructor(name){
         this.name = name;
         this.teams = []
@@ -20,7 +20,10 @@ class PokemonService{
     static url = "https://63b376615901da0ab380340f.mockapi.io/PokemonList/Pokemon";
 
     static getAllPokemons(){
-        return $.get(this.url);
+        
+        return $.get(this.url, (data) =>{
+            console.log(data)
+        })
     }
 
     static getPokemon(id){
@@ -33,7 +36,7 @@ class PokemonService{
 
     static updatePokemon(pokemon){
         return $.ajax({
-            url: this.url + `/${pokemon._id}`,
+            url: this.url + `/${pokemon.id}`,
             dataType:'json',
             data: JSON.stringify(pokemon),
             contentType:'application/json',
@@ -41,7 +44,7 @@ class PokemonService{
         });
     }
 
-    static deletePokemon(id) {
+    static deleteTeam(id) {
         return $.ajax ({
            url: this.url + `/${id}`,
            type:'DELETE' 
@@ -57,15 +60,15 @@ class DOMManager{
     }
 
     static createPokemon(name){
-        PokemonService.createPokemon(new Pokmeon(name))
+        PokemonService.createPokemon(new Pokemon(name))
         .then(() => {
             return PokemonService.getAllPokemons();
         })
         .then((pokemons) => this.render(pokemons));
     }
 
-    static deletePokemon(id) {
-        PokemonService.deletePokemon(id)
+    static deleteTeam(id) {
+        PokemonService.deleteTeam(id)
         .then(() => {
             return PokemonService.getAllPokemons();
         })
@@ -74,8 +77,8 @@ class DOMManager{
 
     static addPokemon(id) {
         for (let pokemon of this.pokemons) {
-            if(pokemon._id == id){
-                pokemon.teams.push(new Team($(`#${pokemon._id}-team-name`).val(), $(`#${pokemon._id}-team-move`).val()));
+            if(pokemon.id == id){
+                pokemon.teams.push(new Team($(`#${pokemon.id}-team-name`).val(), $(`#${pokemon.id}-team-move`).val()));
                 PokemonService.updatePokemon(pokemon)
                 .then(() => {
                     return PokemonService.getAllPokemons();
@@ -85,12 +88,12 @@ class DOMManager{
         }
     }
 
-    static deleteTeam(pokemonId, teamId) {
+    static deletePokemon(pokemonId, teamId) {
         for (let pokemon of this.pokemons) {
-            if (pokemon._id == pokemonId) {
+            if (pokemon.id == pokemonId) {
                 for (let team of pokemon.teams) {
-                    if (team._id == teamId){
-                        pokemon.teams.splice(pokemon.teams.indexOf(move), 1);
+                    if (team.id == teamId){
+                        pokemon.teams.splice(pokemon.teams.indexOf(team), 1);
                         PokemonService.updatePokemon(pokemon)
                         .then(() => {
                             return PokemonService.getAllPokemons();
@@ -101,39 +104,40 @@ class DOMManager{
             }
         }
     }
+    
 
     static render(pokemons){
         this.pokemons = pokemons;
         $('#app').empty();
         for (let pokemon of pokemons){
             $('#app').prepend(
-                `<div id="${pokemon._id}" class="card">
+                `<div id="${pokemon.id}" class="card">
                 <div class= "card-header">
                 <h2>${pokemon.name}</h2>
-                <button class="btn btn-danger" onclick="DOMManager.deletePokemon('${pokemon._id}')">Delete</button>
+                <button class="btn btn-danger" onclick="DOMManager.deleteTeam('${pokemon.id}')">Delete Team</button>
                 </div>
                 <div class="card-body">
                     <div class="card">
                     <div class="row">
                     <div class="col-sm">
-                    <input type="text" id="${pokemon._id}team-name" class="form-control" placeholder="Pokemon Name"
+                    <input type="text" id="${pokemon.id}-team-name" class="form-control" placeholder="Pokemon Name"
                     </div>
                     <div class="col-sm">
-                    <input type="text" id="${pokemon._id}team-move" class="form-control" placeholder="Pokemon Moves"
+                    <input type="text" id="${pokemon.id}-team-move" class="form-control" placeholder="Pokemon Moves"
                     </div>
                     </div>
-                    <button id="${pokemon._id}-new-team" onclick="DOMManager.addPokemon('${pokemon._id}')" class="btn btn-primary form-control">Add</button>
+                    <button id="${pokemon.id}create-new-pokemon" onclick="DOMManager.addPokemon('${pokemon.id}')" class="btn btn-primary form-control">Add</button>
                     </div>
                 </div>
                 </div><br>`
 
             );
-            for(let team of pokemon.teams){
-                $(`#${pokemon._id}`).find('.card-body').append(
+            for (let team of pokemon.teams){
+                $(`#${pokemon.id}`).find('.card-body').append(
                     `<p>
-                    <span id="name-${team._id}"><strong>Name: </strong> ${team.name}</span>
-                    <span id="move-${team._id}"><strong>Move: </strong> ${team.move}</span>
-                    <button class="btn btn-danger" onclick="DOMManager.deletePokemon('${pokemon._id}', '${team._id}')">Delete Pokemon</button>`
+                    <span id="name-${team.id}"><strong>Name: </strong> ${team.name}</span>
+                    <span id="move-${team.id}"><strong>Move: </strong> ${team.move}</span>
+                    <button class="btn btn-danger" onclick="DOMManager.deletePokemon(${pokemon.id}, ${team.id})">Delete Pokemon</button></p>`
                 );
             }
         }
@@ -142,8 +146,8 @@ class DOMManager{
 
 
 $(`#create-new-pokemon`).on("click",() => {
-    DOMManager.createPokemon($(`#new-pokmemon-name`).val());
-    $(`#new-pokmemon-name`).val('');
+    DOMManager.createPokemon($(`#new-pokemon-name`).val());
+    $(`#new-pokemon-name`).val('');
 })
 
 DOMManager.getAllPokemon();
