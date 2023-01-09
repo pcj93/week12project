@@ -1,3 +1,4 @@
+//classes start and end will also show where i put my team array and my function for adding pokemon
 class Pokemon {
     constructor(name){
         this.name = name;
@@ -15,7 +16,9 @@ class Team {
         this.move = move;
     }
 }
+//end of classes
 
+//what i used to get my url and make sure that it renders into that mock api
 class PokemonService{
     static url = "https://63b376615901da0ab380340f.mockapi.io/PokemonList/Pokemon";
 
@@ -51,6 +54,10 @@ class PokemonService{
         });
     }
 }
+
+//end of mock api
+
+//what is used to render funtions and methods onto app.
 
 class DOMManager{
     static pokemons;
@@ -149,5 +156,7 @@ $(`#create-new-pokemon`).on("click",() => {
     DOMManager.createPokemon($(`#new-pokemon-name`).val());
     $(`#new-pokemon-name`).val('');
 })
+// end of app 
 
+//what is invoked in order to have the whole app work.
 DOMManager.getAllPokemon();
